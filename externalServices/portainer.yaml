@@ -1,44 +1,44 @@
-# ServersTransport: Skip TLS verification for Proxmox self-signed cert
+# ServersTransport: Skip TLS verification for portainer self-signed cert
 apiVersion: traefik.io/v1alpha1
 kind: ServersTransport
 metadata:
-  name: proxmox-transport
+  name: portainer-transport
   namespace: external-infra
 spec:
   insecureSkipVerify: true
 ---
-# Service: Virtual cluster service pointing to external Proxmox
+# Service: Virtual cluster service pointing to external portainer
 apiVersion: v1
 kind: Service
 metadata:
-  name: proxmox-service
+  name: portainer-service
   namespace: external-infra
   annotations:
-    traefik.ingress.kubernetes.io/service.serverstransport: external-infra-proxmox-transport@kubernetescrd
+    traefik.ingress.kubernetes.io/service.serverstransport: external-infra-portainer-transport@kubernetescrd
 spec:
   clusterIP: None
   ports:
     - name: https
-      port: 8006
-      targetPort: 8006
+      port: 9443
+      targetPort: 9443
       protocol: TCP
 ---
-# EndpointSlice: Maps service to actual Proxmox IP
+# EndpointSlice: Maps service to actual portainer IP
 apiVersion: discovery.k8s.io/v1
 kind: EndpointSlice
 metadata:
-  name: proxmox-slice
+  name: portainer-slice
   namespace: external-infra
   labels:
-    kubernetes.io/service-name: proxmox-service
+    kubernetes.io/service-name: portainer-service
 addressType: IPv4
 ports:
   - name: https
-    port: 8006
+    port: 9443
     protocol: TCP
 endpoints:
   - addresses:
-      - "10.10.10.150"
+      - "10.10.10.114"
     conditions:
       ready: true
 ---
@@ -46,7 +46,7 @@ endpoints:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: proxmox-ingress
+  name: portainer-ingress
   namespace: external-infra
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
@@ -57,16 +57,16 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - "proxmox.560384.xyz"
-      secretName: proxmox-tls-secret
+        - "portainer.560384.xyz"
+      secretName: portainer-tls-secret
   rules:
-    - host: "proxmox.560384.xyz"
+    - host: "portainer.560384.xyz"
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: proxmox-service
+                name: portainer-service
                 port:
-                  number: 8006
+                  number: 9443

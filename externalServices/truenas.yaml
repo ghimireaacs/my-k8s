@@ -2,31 +2,31 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: n8n-service
+  name: truenas-service
   namespace: external-infra
 spec:
   ports:
     - name: http
       protocol: TCP
       port: 80          # Traefik talks to 80
-      targetPort: 5678  # Maps to n8n container port
+      targetPort: 80
 ---
 # 2. EndpointSlice (The Bridge)
 apiVersion: discovery.k8s.io/v1
 kind: EndpointSlice
 metadata:
-  name: n8n-slice
+  name: truenas-slice
   namespace: external-infra
   labels:
-    kubernetes.io/service-name: n8n-service
+    kubernetes.io/service-name: truenas-service
 addressType: IPv4
 ports:
   - name: http
-    port: 5678
+    port: 80
     protocol: TCP
 endpoints:
   - addresses:
-      - "10.10.10.114"
+      - "10.10.10.200"
     conditions:
       ready: true
 ---
@@ -34,7 +34,7 @@ endpoints:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: n8n-ingress
+  name: truenas-ingress
   namespace: external-infra
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
@@ -44,16 +44,16 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - "n8n.560384.xyz"
-      secretName: n8n-tls-secret
+        - "truenas.560384.xyz"
+      secretName: truenas-tls-secret
   rules:
-    - host: "n8n.560384.xyz"
+    - host: "truenas.560384.xyz"
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: n8n-service
+                name: truenas-service
                 port:
                   number: 80
