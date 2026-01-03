@@ -1,0 +1,54 @@
+# Web data
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: karakeep-web-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes: [ ReadWriteMany ]
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 10.10.10.200
+    path: /mnt/ghostdata/ghostsilo/99_System/K8S-Data/karakeep/web
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: karakeep-web-pvc
+  namespace: personal
+spec:
+  accessModes: [ ReadWriteMany ]
+  storageClassName: ""
+  volumeName: karakeep-web-pv
+  resources:
+    requests:
+      storage: 10Gi
+
+# Meilisearch data
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: karakeep-meili-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes: [ ReadWriteMany ]
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: 10.10.10.200
+    path: /mnt/ghostdata/ghostsilo/99_System/K8S-Data/karakeep/meilisearch
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: karakeep-meili-pvc
+  namespace: personal
+spec:
+  accessModes: [ ReadWriteMany ]
+  storageClassName: ""
+  volumeName: karakeep-meili-pv
+  resources:
+    requests:
+      storage: 10Gi

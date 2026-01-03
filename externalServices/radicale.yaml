@@ -2,72 +2,58 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: pihole-service
+  name: radicale-service
   namespace: external-infra
 spec:
   ports:
     - name: http
       protocol: TCP
       port: 80          # Traefik talks to 80
+      targetPort: 5232
 ---
 # 2. EndpointSlice (The Bridge)
 apiVersion: discovery.k8s.io/v1
 kind: EndpointSlice
 metadata:
-  name: pihole-slice
+  name: radicale-slice
   namespace: external-infra
   labels:
-    kubernetes.io/service-name: pihole-service
+    kubernetes.io/service-name: radicale-service
 addressType: IPv4
 ports:
   - name: http
-    port: 80
+    port: 5232
     protocol: TCP
 endpoints:
   - addresses:
-      - "10.10.10.153"
+      - "10.10.10.114"
     conditions:
       ready: true
 ---
-# 3. Middleware (to auto route to /admin)
-
-apiVersion: traefik.io/v1alpha1
-kind: Middleware
-metadata:
-  name: pihole-root-redirect
-  namespace: external-infra
-spec:
-  redirectRegex:
-    regex: "^https://pihole\\.560384\\.xyz/?$"
-    replacement: "https://pihole.560384.xyz/admin"
-    permanent: true
-
----
-# 4. Ingress (The Route)
+# 3. Ingress (The Route)
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: pihole-ingress
+  name: radicale-ingress
   namespace: external-infra
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: websecure
     traefik.ingress.kubernetes.io/router.tls: "true"
     cert-manager.io/cluster-issuer: "letsencrypt-prod-cf"
-    traefik.ingress.kubernetes.io/router.middlewares: external-infra-pihole-root-redirect@kubernetescrd
 spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - "pihole.560384.xyz"
-      secretName: pihole-tls-secret
+        - "radicale.560384.xyz"
+      secretName: radicale-tls-secret
   rules:
-    - host: "pihole.560384.xyz"
+    - host: "radicale.560384.xyz"
       http:
         paths:
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: pihole-service
+                name: radicale-service
                 port:
                   number: 80
