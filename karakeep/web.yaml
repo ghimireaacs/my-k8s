@@ -38,17 +38,17 @@ spec:
               name: karakeep-secrets
               key: APP_SECRET_KEY
 
-        - name: OPENAI_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: karakeep-secrets
-              key: OPENAI_API_KEY
-
         - name: OLLAMA_BASE_URL
           valueFrom:
             secretKeyRef:
               name: karakeep-secrets
               key: OLLAMA_BASE_URL
+
+        - name: INFERENCE_TEXT_MODEL
+          valueFrom:
+            secretKeyRef:
+              name: karakeep-secrets
+              key: INFERENCE_TEXT_MODEL
 
         - name: SMTP_PASSWORD
           valueFrom:
