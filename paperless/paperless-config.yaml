@@ -15,3 +15,6 @@ data:
   PAPERLESS_FILENAME_FORMAT: "{document_type}/{created_year}/{title}"
   PAPERLESS_BIND_ADDR: 0.0.0.0
   PAPERLESS_PORT: "8000"
+  PAPERLESS_MEDIA_ROOT: /usr/src/paperless/media
+  PAPERLESS_CONSUMER_DIR: /usr/src/paperless/consume
+  PAPERLESS_EXPORT_DIR: /usr/src/paperless/export

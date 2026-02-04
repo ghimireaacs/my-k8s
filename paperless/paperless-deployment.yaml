@@ -99,7 +99,6 @@ kind: Deployment
 metadata:
   name: paperless
   namespace: personal
-spec:
   replicas: 1
   selector:
     matchLabels:
@@ -108,27 +107,43 @@ spec:
     metadata:
       labels:
         app: paperless
+
     spec:
+      securityContext:
+        fsGroup: 3000
       containers:
         - name: paperless
           image: ghcr.io/paperless-ngx/paperless-ngx:latest
+          securityContext:
+            runAsUser: 3000
+            runAsGroup: 3000
           envFrom:
             - secretRef:
                 name: paperless-secrets
             - configMapRef:
                 name: paperless-config
+          resources:
+            requests:
+              cpu: "250m"
+              memory: "512Mi"
+            limits:
+              cpu: "2"
+              memory: "2Gi"
+
           volumeMounts:
             - name: documents
               mountPath: /usr/src/paperless/media
+              subPath: .paperless/media
+            - name: documents
+              mountPath: /usr/src/paperless/export
+              subPath: Shared/Inbox/Exports
+            - name: documents
+              mountPath: /usr/src/paperless/consume
+              subPath: Shared/Inbox/To-Scan
             - name: system
               mountPath: /usr/src/paperless/data
               subPath: 99_Service/data
-            - name: system
-              mountPath: /usr/src/paperless/consume
-              subPath: 99_Service/consume
-            - name: system
-              mountPath: /usr/src/paperless/export
-              subPath: 99_Service/export
+
       volumes:
         - name: documents
           persistentVolumeClaim:

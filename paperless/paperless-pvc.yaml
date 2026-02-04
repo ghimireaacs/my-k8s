@@ -10,7 +10,7 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   nfs:
     server: 10.10.10.200
-    path: /mnt/ghostdata/ghostsilo/01_Documents/99_Paperless
+    path: /mnt/ghostdata/ghostsilo/01_Documents
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
