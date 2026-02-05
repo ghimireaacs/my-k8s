@@ -20,6 +20,13 @@ ports:
     tls:
       enabled: true
 
+  syslog:
+    expose:
+      default: true
+    port: 514
+    exposedPort: 514
+    protocol: UDP
+
 entryPoints:
   web:
     address: ":80"
@@ -27,6 +34,10 @@ entryPoints:
     address: ":443"
     tls:
       enabled: true
+  syslog:
+    address: ":514/udp"
+
+
 
 providers:
   kubernetesCRD:
